@@ -1,13 +1,31 @@
-# molt
+<p align="center">
+  <h1 align="center">𝕏 molt</h1>
+  <p align="center">
+    <strong>Shed your old tweets. From the terminal.</strong>
+  </p>
+  <p align="center">
+    <a href="#install">Install</a> &bull;
+    <a href="#features">Features</a> &bull;
+    <a href="#batch-delete">Batch Delete</a> &bull;
+    <a href="#archive-system">Archive</a> &bull;
+    <a href="#tech-stack">Stack</a>
+  </p>
+</p>
 
-A terminal UI for managing your X.com (Twitter) account — built for the **Free API tier**.
+<p align="center">
+  <img src="https://img.shields.io/badge/X_API-Free_Tier-1DA1F2?style=flat-square&logo=x" alt="X API Free Tier" />
+  <img src="https://img.shields.io/badge/UI-Ink_5_(React)-61DAFB?style=flat-square&logo=react" alt="Ink 5" />
+  <img src="https://img.shields.io/badge/Search-SQLite_FTS5-003B57?style=flat-square&logo=sqlite" alt="SQLite FTS5" />
+  <img src="https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/github/license/DataGobes/Molt?style=flat-square" alt="MIT License" />
+</p>
 
-Post tweets, delete tweets, view your profile, import your X data archive, and batch-delete old tweets with full-text search and rate limiting — all from the terminal.
+---
 
 ```
   𝕏  molt v1.0.0
 ──────────────────────────────────────────────────
-Manage your X.com account from the terminal.
+  Manage your X.com account from the terminal.
 
   ❯ Post Tweet         Compose and publish a tweet
     Delete Tweet       Delete a tweet by ID
@@ -19,122 +37,154 @@ Manage your X.com account from the terminal.
   ↑↓: navigate  │  enter: select  │  q: quit
 ```
 
+---
+
+## Why molt?
+
+Birds molt to shed old feathers and grow new ones. Your X account deserves the same.
+
+**The problem:** You have 12 years of tweets. Some aged poorly. The X website lets you delete them one. at. a. time.
+
+**molt** imports your full archive into a local SQLite database with full-text search, lets you filter by date/keyword/type, and batch-deletes at the maximum rate the Free API tier allows — **~180 tweets/hour**, hands-free, with pause/resume.
+
+No subscriptions. No third-party services touching your data. Just a TypeScript TUI running on your machine.
+
 ## Features
 
-- **Post tweets** with a 280-character live counter and monthly limit tracking (1,500/month on Free tier)
-- **Delete tweets** by ID with confirmation
-- **View your profile** — followers, following, tweet count, bio
-- **Import your X data archive** — supports both `tweets.js` and `.zip` formats
-- **Full-text search** across your entire tweet history using SQLite FTS5
-- **Batch delete** with filters (date range, keyword, replies/retweets) and built-in rate limiting
-- **First-run setup** guides you through pasting your API credentials
-- **Credential security** — config saved with `chmod 600` permissions
+| | Feature | Details |
+|---|---|---|
+| **Post** | Compose tweets | 280-char live counter, monthly limit tracking (1,500/mo) |
+| **Delete** | Remove by ID | Paste a tweet ID, confirm, done |
+| **Profile** | View your stats | Followers, following, tweets, join date |
+| **Import** | Load your archive | Supports `tweets.js` and `.zip` — parsed with Zod validation |
+| **Search** | Full-text search | SQLite FTS5 across your entire tweet history |
+| **Batch Delete** | Mass delete | Date range, keyword, reply/RT filters, rate-limited, pausable |
 
 ## Install
 
 ```bash
-git clone https://github.com/yourusername/molt.git
-cd molt
+git clone https://github.com/DataGobes/Molt.git
+cd Molt
 pnpm install
+pnpm dev
 ```
+
+That's it. First run launches the setup wizard.
 
 ## Setup
 
-You need X API credentials on the [Free tier](https://developer.x.com/en/portal/dashboard). You'll need four values:
+You need four credentials from the [X Developer Portal](https://developer.x.com/en/portal/dashboard) (Free tier):
 
-| Credential | Where to find it |
-|---|---|
-| App Key (API Key) | Developer Portal → Project → Keys and Tokens |
-| App Secret (API Secret) | Same page |
-| Access Token | Same page → Generate |
-| Access Secret | Same page → Generate |
-
-There are two ways to configure credentials:
-
-**Option A** — Interactive setup (recommended): Just run `pnpm dev` and the setup wizard will walk you through it. Credentials are saved to `~/.config/molt/credentials.json`.
-
-**Option B** — Environment file: Copy `.env.example` to `.env` and fill in the values:
-
-```bash
-cp .env.example .env
+```
+App Key  ·  App Secret  ·  Access Token  ·  Access Secret
 ```
 
-## Usage
+Two ways to configure:
 
-```bash
-pnpm dev      # Development mode (tsx)
-pnpm build    # Build to dist/
-pnpm start    # Run built version
+**Interactive** (recommended) — `pnpm dev` walks you through it. Credentials are saved to `~/.config/molt/credentials.json` with `chmod 600`.
+
+**Manual** — Copy `.env.example` to `.env` and fill in the values.
+
+## Keyboard
+
+```
+  ↑/↓        Navigate menus
+  Enter      Select
+  Esc        Go back
+  q          Quit (main menu)
+  j/k        Scroll tweet lists
+  s          Search (archive browser)
+  p          Pause/resume (batch delete)
+  c          Cancel (batch delete)
 ```
 
-### Navigation
+## Batch Delete
 
-| Key | Action |
-|-----|--------|
-| `↑` / `↓` | Navigate menus |
-| `Enter` | Select |
-| `Esc` | Go back |
-| `q` | Quit (from main menu) |
-| `j` / `k` | Scroll tweet lists |
-| `s` | Search (in archive browser) |
-| `p` | Pause/resume (during batch delete) |
-| `c` | Cancel (during batch delete) |
+The killer feature. Here's how it works:
 
-### Importing Your Archive
+```
+┌─ Configure Filters ──────────────────────────────┐
+│  Before date:     2023-01-01                      │
+│  Keyword:         "crypto"                        │
+│  Include replies: NO                              │
+│  Include RTs:     NO                              │
+│  ─────────────────────────────────────────────── │
+│  Preview matching tweets →                        │
+└───────────────────────────────────────────────────┘
 
-1. Request your data archive at [x.com/settings/download_your_data](https://x.com/settings/download_your_data)
-2. Wait for the download link (can take 24+ hours)
-3. In molt, select **Import Archive** and paste the path to the `.zip` file or the extracted `tweets.js`
+  ⚠ 2,847 tweets match your filters
+  Estimated time: ~15h 49m (45 deletes per 15-min window)
 
-Tweets are stored in a local SQLite database with full-text search indexing. You can search by keyword and filter by date range.
+  ❯ Start deleting
+    Adjust filters
+    Cancel
 
-### Batch Delete
+  [██████████░░░░░░░░░░░░░░░░░░░░] 34%
+  ✓ 968  ✗ 3  ⊘ 12  / 2,847
+  ETA: 10h 24m
+  ─────────────────────────────
+  p: pause  │  c: cancel
+```
 
-The batch delete feature respects X's Free tier rate limits:
+- **Rate-limited** — 45 of 50 slots per 15-min window (5-slot safety buffer)
+- **~180 deletes/hour** — ETA shown upfront before you commit
+- **Pause/resume** — step away, come back, pick up where you left off
+- **Idempotent** — already-deleted tweets are tracked in SQLite and skipped on re-runs
+- **Filters** — date range, keyword (FTS5), include/exclude replies and retweets
 
-- **50 deletes per 15-minute window** (uses 45 with a 5-slot safety buffer)
-- **~180 deletes per hour** — the UI shows an ETA before you start
-- **Pause/resume** with `p`, cancel with `c`
-- **Idempotent** — already-deleted tweets are skipped on re-runs
-- **Filters**: date range, keyword, include/exclude replies and retweets
+## Archive System
+
+1. Request your archive at [x.com/settings/download_your_data](https://x.com/settings/download_your_data)
+2. Import the `.zip` or extracted `tweets.js` into molt
+3. All tweets stored in a local SQLite database with FTS5 full-text search
+4. Browse, search, and filter — then feed results into batch delete
+
+The archive parser handles X's `window.YTD.tweets.part0 = [...]` format, validates every tweet with Zod, and imports via a single SQLite transaction.
 
 ## Tech Stack
 
-| Tool | Purpose |
-|------|---------|
-| [Ink 5](https://github.com/vadimdemedes/ink) + [@inkjs/ui](https://github.com/vadimdemedes/ink-ui) | React-based terminal UI |
-| [twitter-api-v2](https://github.com/PLhery/node-twitter-api-v2) | Fully typed X API client |
-| [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) | SQLite with FTS5 full-text search |
-| [zod](https://github.com/colinhacks/zod) | Runtime validation of archive data |
-| [date-fns](https://date-fns.org/) | Date formatting |
-| [tsup](https://github.com/egoist/tsup) | Build |
-| [tsx](https://github.com/privatenumber/tsx) | Dev runner |
+| | Tool | Why |
+|---|---|---|
+| **UI** | [Ink 5](https://github.com/vadimdemedes/ink) + [@inkjs/ui](https://github.com/vadimdemedes/ink-ui) | React components that render to the terminal — same tech behind GitHub Copilot CLI |
+| **API** | [twitter-api-v2](https://github.com/PLhery/node-twitter-api-v2) | Fully typed, OAuth 1.0a, handles all the X API quirks |
+| **Storage** | [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) | Synchronous SQLite with FTS5 full-text search — no server needed |
+| **Validation** | [zod](https://github.com/colinhacks/zod) | Runtime validation of archive data and credentials |
+| **Build** | [tsup](https://github.com/egoist/tsup) + [tsx](https://github.com/privatenumber/tsx) | Fast ESM builds and dev runner |
 
 ## Project Structure
 
 ```
 src/
-├── index.tsx              # Entry point
-├── app.tsx                # Root component + screen router
-├── types.ts               # Shared types + Zod schemas
-├── config.ts              # Credential loading
+├── index.tsx                 Entry point
+├── app.tsx                   Screen router + global keys
+├── types.ts                  Shared types + Zod schemas
+├── config.ts                 Credential loading (.env / ~/.config/molt/)
 ├── screens/
-│   ├── main-menu.tsx      # Home menu
-│   ├── setup.tsx          # First-run credential wizard
-│   ├── post-tweet.tsx     # Compose + publish
-│   ├── delete-tweet.tsx   # Delete by ID
-│   ├── profile.tsx        # View account info
-│   ├── import-archive.tsx # Import X data archive
-│   ├── archive-browser.tsx# Browse/search tweets
-│   └── batch-delete.tsx   # Filter + mass delete
-├── components/            # Reusable UI components
+│   ├── main-menu.tsx         Home
+│   ├── setup.tsx             First-run credential wizard
+│   ├── post-tweet.tsx        Compose → preview → post
+│   ├── delete-tweet.tsx      ID input → confirm → delete
+│   ├── profile.tsx           Fetch + display account info
+│   ├── import-archive.tsx    File path → parse → SQLite
+│   ├── archive-browser.tsx   Search + browse + detail view
+│   └── batch-delete.tsx      Filter → preview → confirm → progress
+├── components/               Header, footer, tweet card, progress bar, char counter
 ├── services/
-│   ├── twitter-client.ts  # X API wrapper
-│   ├── archive-parser.ts  # Parse tweets.js / .zip
-│   ├── archive-store.ts   # SQLite + FTS5
-│   └── rate-limiter.ts    # Sliding window limiter
-├── hooks/                 # React hooks
-└── utils/                 # Constants + formatting
+│   ├── twitter-client.ts     Thin wrapper around twitter-api-v2
+│   ├── archive-parser.ts     Parse tweets.js + .zip archives
+│   ├── archive-store.ts      SQLite schema, FTS5, queries
+│   └── rate-limiter.ts       Sliding window rate limiter
+├── hooks/                    useNavigation, useTwitter, useArchive
+└── utils/                    Constants + formatting
+```
+
+## Contributing
+
+PRs welcome. The codebase is standard React — if you've built a web app, you can build a screen for molt.
+
+```bash
+pnpm dev          # Dev mode with hot reload
+pnpm build        # Production build → dist/index.js
 ```
 
 ## License

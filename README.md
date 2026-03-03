@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">𝕏 molt</h1>
+  <h1 align="center">𝕏 x-molt</h1>
   <p align="center">
     <strong>Shed your old tweets. From the terminal.</strong>
   </p>
@@ -23,7 +23,7 @@
 ---
 
 ```
-  𝕏  molt v1.0.0
+  𝕏  x-molt v1.0.0
 ──────────────────────────────────────────────────
   Manage your X.com account from the terminal.
 
@@ -39,13 +39,13 @@
 
 ---
 
-## Why molt?
+## Why x-molt?
 
 Birds molt to shed old feathers and grow new ones. Your X account deserves the same.
 
 **The problem:** You have 12 years of tweets. Some aged poorly. The X website lets you delete them one. at. a. time.
 
-**molt** imports your full archive into a local SQLite database with full-text search, lets you filter by date/keyword/type, and batch-deletes at the maximum rate the Free API tier allows — **~180 tweets/hour**, hands-free, with pause/resume.
+**x-molt** imports your full archive into a local SQLite database with full-text search, lets you filter by date/keyword/type, and batch-deletes at the maximum rate the Free API tier allows — **~180 tweets/hour**, hands-free, with pause/resume.
 
 No subscriptions. No third-party services touching your data. Just a TypeScript TUI running on your machine.
 
@@ -81,7 +81,7 @@ App Key  ·  App Secret  ·  Access Token  ·  Access Secret
 
 Two ways to configure:
 
-**Interactive** (recommended) — `pnpm dev` walks you through it. Credentials are saved to `~/.config/molt/credentials.json` with `chmod 600`.
+**Interactive** (recommended) — `pnpm dev` walks you through it. Credentials are saved to `~/.config/x-molt/credentials.json` with `chmod 600`.
 
 **Manual** — Copy `.env.example` to `.env` and fill in the values.
 
@@ -135,7 +135,7 @@ The killer feature. Here's how it works:
 ## Archive System
 
 1. Request your archive at [x.com/settings/download_your_data](https://x.com/settings/download_your_data)
-2. Import the `.zip` or extracted `tweets.js` into molt
+2. Import the `.zip` or extracted `tweets.js` into x-molt
 3. All tweets stored in a local SQLite database with FTS5 full-text search
 4. Browse, search, and filter — then feed results into batch delete
 
@@ -158,7 +158,7 @@ src/
 ├── index.tsx                 Entry point
 ├── app.tsx                   Screen router + global keys
 ├── types.ts                  Shared types + Zod schemas
-├── config.ts                 Credential loading (.env / ~/.config/molt/)
+├── config.ts                 Credential loading (.env / ~/.config/x-molt/)
 ├── screens/
 │   ├── main-menu.tsx         Home
 │   ├── setup.tsx             First-run credential wizard
@@ -180,7 +180,7 @@ src/
 
 ## Contributing
 
-PRs welcome. The codebase is standard React — if you've built a web app, you can build a screen for molt.
+PRs welcome. The codebase is standard React — if you've built a web app, you can build a screen for x-molt.
 
 ```bash
 pnpm dev          # Dev mode with hot reload

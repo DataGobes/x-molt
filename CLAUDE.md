@@ -1,4 +1,4 @@
-# molt
+# x-molt
 
 Terminal UI for X.com account management, built with Ink 5 (React for the terminal).
 
@@ -28,7 +28,7 @@ src/
 ├── index.tsx           # Entry point — renders <App />
 ├── app.tsx             # Root component, screen router, global key handlers
 ├── types.ts            # All shared types + Zod schemas
-├── config.ts           # Credential loading (.env / ~/.config/molt/)
+├── config.ts           # Credential loading (.env / ~/.config/x-molt/)
 ├── screens/            # One component per screen (main-menu, setup, profile, etc.)
 ├── components/         # Reusable UI (header, footer, tweet-card, tweet-list, etc.)
 ├── services/           # Business logic (twitter-client, archive-parser, archive-store, rate-limiter)
@@ -54,7 +54,7 @@ src/
 
 Loaded from (in order):
 1. `.env` file (X_APP_KEY, X_APP_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET)
-2. `~/.config/molt/credentials.json` (saved by setup screen with chmod 600)
+2. `~/.config/x-molt/credentials.json` (saved by setup screen with chmod 600)
 
 ## Data
 

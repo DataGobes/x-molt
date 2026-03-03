@@ -1,17 +1,17 @@
 {
-  "name": "molt",
+  "name": "x-molt",
   "version": "1.0.0",
   "description": "Terminal UI for X.com account management",
   "type": "module",
   "bin": {
-    "molt": "./dist/index.js"
+    "x-molt": "./dist/index.js"
   },
   "scripts": {
     "dev": "tsx src/index.tsx",
     "build": "tsup",
     "start": "node dist/index.js"
   },
-  "keywords": ["x", "twitter", "tui", "cli", "terminal", "ink", "molt"],
+  "keywords": ["x", "twitter", "tui", "cli", "terminal", "ink", "x-molt"],
   "license": "MIT",
   "engines": {
     "node": ">=18"

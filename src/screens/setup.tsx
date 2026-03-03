@@ -75,7 +75,7 @@ export function SetupScreen({ twitter, onComplete }: SetupProps) {
 
       {step === "welcome" && (
         <Box flexDirection="column">
-          <Text>Welcome to <Text color={BRAND_COLOR} bold>molt</Text>!</Text>
+          <Text>Welcome to <Text color={BRAND_COLOR} bold>x-molt</Text>!</Text>
           <Text color={MUTED_COLOR}>
             You'll need X API credentials (Free tier). Get them at:
           </Text>
@@ -165,7 +165,7 @@ export function SetupScreen({ twitter, onComplete }: SetupProps) {
       {step === "done" && (
         <Box flexDirection="column">
           <Text color={SUCCESS_COLOR}>✓ Credentials verified and saved!</Text>
-          <Text color={MUTED_COLOR}>Saved to ~/.config/molt/credentials.json (chmod 600)</Text>
+          <Text color={MUTED_COLOR}>Saved to ~/.config/x-molt/credentials.json (chmod 600)</Text>
         </Box>
       )}
 

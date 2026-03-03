@@ -7,9 +7,9 @@ export const DELETE_SAFETY_BUFFER = 5;
 export const EFFECTIVE_DELETE_LIMIT = DELETE_RATE_LIMIT - DELETE_SAFETY_BUFFER; // 45
 
 // App metadata
-export const APP_NAME = "molt";
+export const APP_NAME = "x-molt";
 export const APP_VERSION = "1.0.0";
-export const CONFIG_DIR_NAME = "molt";
+export const CONFIG_DIR_NAME = "x-molt";
 export const DB_FILENAME = "archive.db";
 export const CREDENTIALS_FILENAME = "credentials.json";
 

@@ -14,7 +14,7 @@ export function Header({ title }: HeaderProps) {
     <Box flexDirection="column" marginBottom={1}>
       <Box>
         <Text color={BRAND_COLOR} bold>
-          {"  𝕏  molt"}
+          {"  𝕏  x-molt"}
         </Text>
         <Text color="gray"> v{APP_VERSION}</Text>
         {title && (

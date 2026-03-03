@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">𝕏 x-molt</h1>
+  <h1 align="center">𝕏 molt</h1>
   <p align="center">
     <strong>Shed your old tweets. From the terminal.</strong>
   </p>

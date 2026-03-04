@@ -4,11 +4,12 @@ import { BRAND_COLOR, APP_VERSION } from "../utils/constants.js";
 
 interface HeaderProps {
   title?: string;
+  width?: number;
 }
 
-export function Header({ title }: HeaderProps) {
+export function Header({ title, width: explicitWidth }: HeaderProps) {
   const { stdout } = useStdout();
-  const width = stdout?.columns ?? 60;
+  const width = explicitWidth ?? stdout?.columns ?? 60;
 
   return (
     <Box flexDirection="column" marginBottom={1}>

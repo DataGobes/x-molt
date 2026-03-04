@@ -5,11 +5,12 @@ import { MUTED_COLOR } from "../utils/constants.js";
 interface FooterProps {
   hints?: string[];
   showBack?: boolean;
+  width?: number;
 }
 
-export function Footer({ hints = [], showBack = false }: FooterProps) {
+export function Footer({ hints = [], showBack = false, width: explicitWidth }: FooterProps) {
   const { stdout } = useStdout();
-  const width = stdout?.columns ?? 60;
+  const width = explicitWidth ?? stdout?.columns ?? 60;
   const allHints = [
     ...(showBack ? ["esc: back"] : []),
     ...hints,
@@ -24,9 +25,9 @@ export function Footer({ hints = [], showBack = false }: FooterProps) {
   );
 }
 
-export function KeyHints({ hints = [], showBack = false }: FooterProps) {
+export function KeyHints({ hints = [], showBack = false, width: explicitWidth }: FooterProps) {
   const { stdout } = useStdout();
-  const width = stdout?.columns ?? 60;
+  const width = explicitWidth ?? stdout?.columns ?? 60;
   const allHints = [
     ...(showBack ? ["esc: back"] : []),
     ...hints,

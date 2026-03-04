@@ -39,16 +39,19 @@ src/
 ### Key Patterns
 
 - **Screen navigation**: `useNavigation` hook maintains a screen stack. `navigate()` pushes, `goBack()` pops. Global `Esc` = back, `q` on main menu = quit.
-- **Twitter client**: Singleton initialized via `initClient()`. All API calls go through `services/twitter-client.ts`.
+- **Twitter client**: Singleton initialized via `initClient()`. All API calls go through `services/twitter-client.ts`. `setCostTracker()` wires up cost recording.
+- **Cost tracking**: `services/cost-tracker.ts` records per-endpoint costs in `api_usage` SQLite table. `CostBadge` component shows `[~$0.01]` or `[FREE]` inline. Cost dashboard shows session/daily/monthly/all-time spend.
 - **Archive system**: `archive-parser.ts` handles both `.js` and `.zip` formats. `archive-store.ts` manages SQLite with FTS5 for full-text search.
-- **Rate limiting**: Sliding window rate limiter (`services/rate-limiter.ts`) — uses 45 of 50 slots per 15-min window with a 5-slot safety buffer.
+- **Rate limiting**: Endpoint-aware `Map<string, Bucket>` rate limiter (`services/rate-limiter.ts`). `registerEndpoint()` for custom limits; default bucket preserves backward compat.
 - **Batch delete**: AsyncGenerator pattern with AbortController for pause/cancel. Progress tracked in React state and rendered by `ProgressTracker`.
+- **Live tweet rendering**: `LiveTweetCard` for API-fetched tweets (has author info), `TweetCard` for archive tweets. `ActionBar` adds like/RT/bookmark/follow actions with cost badges.
+- **Grouped main menu**: Flat array with separator entries. `CostBadge` per item. Sections: Archive (FREE), Tweets, Social, Messages, Account, Setup.
 
-### X API Free Tier Limits
+### X API Pay-per-use Model
 
-- 50 DELETE requests / 15-min window
-- 1,500 POST requests / month
-- Post tracking stored in `post_log` SQLite table
+- Per-request pricing ($0.005-$0.01/call) tracked in `API_COSTS` map (`utils/constants.ts`)
+- Archive features are FREE (local SQLite only)
+- Cost tracking stored in `api_usage` SQLite table with session/endpoint breakdown
 
 ## Credentials
 
@@ -59,7 +62,7 @@ Loaded from (in order):
 ## Data
 
 - `data/archive.db` — SQLite database (gitignored)
-- Tables: `tweets` (with FTS5 virtual table), `post_log`
+- Tables: `tweets` (with FTS5 virtual table), `post_log`, `api_usage`
 
 ## Common Tasks
 

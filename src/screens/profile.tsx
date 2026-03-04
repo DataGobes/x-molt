@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Box, Text } from "ink";
 import { Spinner } from "@inkjs/ui";
-import { Header } from "../components/header.js";
-import { KeyHints } from "../components/footer.js";
+import { FullScreen } from "../components/full-screen.js";
 import type { UserProfile } from "../types.js";
 import { formatDate, formatNumber } from "../utils/format.js";
+import { CostBadge } from "../components/cost-badge.js";
 import { BRAND_COLOR, ERROR_COLOR, MUTED_COLOR, SUCCESS_COLOR } from "../utils/constants.js";
 
 interface ProfileProps {
@@ -24,12 +24,13 @@ export function ProfileScreen({ twitter, onBack }: ProfileProps) {
   }, []);
 
   return (
-    <Box flexDirection="column">
-      <Header title="My Profile" />
+    <FullScreen title="My Profile" hints={["esc: back"]} showBack>
 
       {twitter.isLoading && (
         <Box>
           <Spinner label="Fetching profile..." />
+          <Text> </Text>
+          <CostBadge endpoint="users/me" />
         </Box>
       )}
 
@@ -44,7 +45,7 @@ export function ProfileScreen({ twitter, onBack }: ProfileProps) {
           <Box
             flexDirection="column"
             borderStyle="round"
-            borderColor={BRAND_COLOR}
+            borderColor="gray"
             paddingX={2}
             paddingY={1}
           >
@@ -86,7 +87,6 @@ export function ProfileScreen({ twitter, onBack }: ProfileProps) {
         </Box>
       )}
 
-      <KeyHints hints={["esc: back"]} showBack />
-    </Box>
+    </FullScreen>
   );
 }

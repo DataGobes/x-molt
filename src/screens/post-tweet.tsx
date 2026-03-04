@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
 import { TextInput, Select } from "@inkjs/ui";
 import { Spinner } from "@inkjs/ui";
-import { Header } from "../components/header.js";
-import { KeyHints } from "../components/footer.js";
+import { FullScreen } from "../components/full-screen.js";
 import { CharCounter } from "../components/char-counter.js";
+import { CostBadge } from "../components/cost-badge.js";
 import { BRAND_COLOR, ERROR_COLOR, SUCCESS_COLOR, MUTED_COLOR, WARNING_COLOR, TWEET_CHAR_LIMIT, MONTHLY_POST_LIMIT } from "../utils/constants.js";
 
 type Step = "compose" | "preview" | "posting" | "done";
@@ -42,8 +42,7 @@ export function PostTweetScreen({ twitter, archive, onBack }: PostTweetProps) {
   };
 
   return (
-    <Box flexDirection="column">
-      <Header title="Post Tweet" />
+    <FullScreen title="Post Tweet" hints={["esc: back"]} showBack>
 
       {/* Monthly limit tracker */}
       <Box marginBottom={1}>
@@ -90,7 +89,7 @@ export function PostTweetScreen({ twitter, archive, onBack }: PostTweetProps) {
           <Text bold>Preview:</Text>
           <Box
             borderStyle="round"
-            borderColor={BRAND_COLOR}
+            borderColor="gray"
             paddingX={1}
             marginY={1}
           >
@@ -103,6 +102,10 @@ export function PostTweetScreen({ twitter, archive, onBack }: PostTweetProps) {
             <Text color={ERROR_COLOR}>Tweet exceeds {TWEET_CHAR_LIMIT} characters!</Text>
           )}
           <Box marginTop={1}>
+            <Box marginBottom={1}>
+              <Text color={MUTED_COLOR}>Estimated cost: </Text>
+              <CostBadge endpoint="tweets/create" />
+            </Box>
             <Select
               options={[
                 { label: "Post it!", value: "post" },
@@ -139,7 +142,6 @@ export function PostTweetScreen({ twitter, archive, onBack }: PostTweetProps) {
         </Box>
       )}
 
-      <KeyHints hints={["esc: back"]} showBack />
-    </Box>
+    </FullScreen>
   );
 }

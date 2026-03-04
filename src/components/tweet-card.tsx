@@ -8,19 +8,25 @@ interface TweetCardProps {
   tweet: StoredTweet;
   selected?: boolean;
   compact?: boolean;
+  maxWidth?: number;
+  width?: number;
 }
 
-export function TweetCard({ tweet, selected = false, compact = false }: TweetCardProps) {
+export function TweetCard({ tweet, selected = false, compact = false, maxWidth, width }: TweetCardProps) {
   const borderColor = selected ? BRAND_COLOR : "gray";
 
   if (compact) {
+    const dateStr = formatDate(tweet.createdAt);
+    // 2 for selector, dateStr length, 1 space, optional [deleted] suffix
+    const overhead = 2 + dateStr.length + 1 + (tweet.deleted ? 10 : 0);
+    const textWidth = maxWidth ? maxWidth - overhead : 60;
     return (
       <Box>
         <Text color={selected ? BRAND_COLOR : undefined}>
           {selected ? "▸ " : "  "}
         </Text>
-        <Text color={MUTED_COLOR}>{formatDate(tweet.createdAt)} </Text>
-        <Text>{truncate(tweet.fullText.replace(/\n/g, " "), 60)}</Text>
+        <Text color={MUTED_COLOR}>{dateStr} </Text>
+        <Text>{truncate(tweet.fullText.replace(/\n/g, " "), Math.max(textWidth, 10))}</Text>
         {tweet.deleted && <Text color={ERROR_COLOR}> [deleted]</Text>}
       </Box>
     );
@@ -33,6 +39,7 @@ export function TweetCard({ tweet, selected = false, compact = false }: TweetCar
       borderColor={borderColor}
       paddingX={1}
       marginBottom={1}
+      {...(width ? { width } : {})}
     >
       <Box justifyContent="space-between">
         <Text color={MUTED_COLOR}>{formatDate(tweet.createdAt)}</Text>

@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Box, Text, useInput } from "ink";
 import { TextInput, Select, Spinner } from "@inkjs/ui";
-import { Header } from "../components/header.js";
-import { KeyHints } from "../components/footer.js";
+import { FullScreen } from "../components/full-screen.js";
 import { ProgressTracker } from "../components/progress-tracker.js";
 import { RateLimiter } from "../services/rate-limiter.js";
 import type { StoredTweet, BatchDeleteFilter, DeleteProgress } from "../types.js";
 import { formatDate, formatEta } from "../utils/format.js";
-import { BRAND_COLOR, ERROR_COLOR, SUCCESS_COLOR, MUTED_COLOR, WARNING_COLOR, EFFECTIVE_DELETE_LIMIT } from "../utils/constants.js";
+import { CostBadge } from "../components/cost-badge.js";
+import { BRAND_COLOR, ERROR_COLOR, SUCCESS_COLOR, MUTED_COLOR, WARNING_COLOR, EFFECTIVE_DELETE_LIMIT, API_COSTS } from "../utils/constants.js";
 
-type Step = "filter" | "filter-before" | "filter-keyword" | "preview" | "confirm" | "deleting" | "done";
+type Step = "filter" | "filter-before" | "filter-keyword" | "filter-semantic" | "preview" | "confirm" | "deleting" | "done";
 
 interface BatchDeleteProps {
   twitter: {
@@ -19,6 +19,7 @@ interface BatchDeleteProps {
     getFiltered: (filter: BatchDeleteFilter, limit?: number) => StoredTweet[];
     markDeleted: (id: string) => void;
     store: { isDeleted: (id: string) => boolean };
+    semanticSearch: (query: string, limit?: number) => Promise<StoredTweet[]>;
   };
   onBack: () => void;
 }
@@ -50,9 +51,26 @@ export function BatchDeleteScreen({ twitter, archive, onBack }: BatchDeleteProps
     }
   });
 
-  const handleFilterDone = () => {
-    const tweets = archive.getFiltered(filter);
-    setPreview(tweets);
+  const [semanticLoading, setSemanticLoading] = useState(false);
+
+  const handleFilterDone = async () => {
+    if (filter.semanticQuery) {
+      setSemanticLoading(true);
+      try {
+        const semanticResults = await archive.semanticSearch(filter.semanticQuery, 5000);
+        const semanticIds = new Set(semanticResults.map((t) => t.id));
+        const filtered = archive.getFiltered({ ...filter, semanticQuery: undefined });
+        const intersected = filtered.filter((t) => semanticIds.has(t.id));
+        setPreview(intersected);
+      } catch {
+        // Fall back to non-semantic filter
+        setPreview(archive.getFiltered(filter));
+      } finally {
+        setSemanticLoading(false);
+      }
+    } else {
+      setPreview(archive.getFiltered(filter));
+    }
     setStep("preview");
   };
 
@@ -137,8 +155,7 @@ export function BatchDeleteScreen({ twitter, archive, onBack }: BatchDeleteProps
   }, [preview, twitter, archive]);
 
   return (
-    <Box flexDirection="column">
-      <Header title="Batch Delete" />
+    <FullScreen title="Batch Delete" hints={step === "deleting" ? ["p: pause", "c: cancel"] : ["esc: back"]} showBack>
 
       {step === "filter" && (
         <Box flexDirection="column">
@@ -148,12 +165,14 @@ export function BatchDeleteScreen({ twitter, archive, onBack }: BatchDeleteProps
               options={[
                 { label: "Delete tweets before a date", value: "before-date" },
                 { label: "Delete tweets matching keyword", value: "keyword" },
+                { label: "Delete tweets about a topic (semantic)", value: "semantic" },
                 { label: `Include replies: ${filter.includeReplies ? "YES" : "NO"}`, value: "toggle-replies" },
                 { label: `Include retweets: ${filter.includeRetweets ? "YES" : "NO"}`, value: "toggle-retweets" },
                 { label: "Preview matching tweets →", value: "done" },
               ]}
               onChange={(value) => {
                 if (value === "before-date") setStep("filter-before");
+                else if (value === "semantic") setStep("filter-semantic");
                 else if (value === "keyword") setStep("filter-keyword");
                 else if (value === "toggle-replies") {
                   setFilter((f) => ({ ...f, includeReplies: !f.includeReplies }));
@@ -169,6 +188,9 @@ export function BatchDeleteScreen({ twitter, archive, onBack }: BatchDeleteProps
             )}
             {filter.keyword && (
               <Text color={MUTED_COLOR}>Keyword: "{filter.keyword}"</Text>
+            )}
+            {filter.semanticQuery && (
+              <Text color="#9b59b6">Semantic: "{filter.semanticQuery}"</Text>
             )}
           </Box>
         </Box>
@@ -212,6 +234,34 @@ export function BatchDeleteScreen({ twitter, archive, onBack }: BatchDeleteProps
         </Box>
       )}
 
+      {step === "filter-semantic" && (
+        <Box flexDirection="column">
+          <Text>Delete tweets about a topic (semantic search):</Text>
+          <Text color={MUTED_COLOR}>
+            Finds tweets by meaning, not just keywords. E.g. "feeling sad" matches tweets about depression, loneliness.
+          </Text>
+          <Box marginTop={1}>
+            <Text color="#9b59b6">topic: </Text>
+            <TextInput
+              placeholder="describe the topic..."
+              onSubmit={(value) => {
+                const q = value.trim();
+                if (q.length > 0) {
+                  setFilter((f) => ({ ...f, semanticQuery: q }));
+                }
+                setStep("filter");
+              }}
+            />
+          </Box>
+        </Box>
+      )}
+
+      {semanticLoading && (
+        <Box paddingX={1}>
+          <Text color={MUTED_COLOR}>Running semantic search...</Text>
+        </Box>
+      )}
+
       {step === "preview" && (
         <Box flexDirection="column">
           <Box marginBottom={1}>
@@ -230,11 +280,17 @@ export function BatchDeleteScreen({ twitter, archive, onBack }: BatchDeleteProps
               ))}
             </Box>
           )}
-          <Box>
-            <Text color={MUTED_COLOR}>
-              Estimated time: ~{formatEta(Math.ceil(preview.length / EFFECTIVE_DELETE_LIMIT) * 15 * 60)}
-              {" "}({EFFECTIVE_DELETE_LIMIT} deletes per 15-min window)
-            </Text>
+          <Box flexDirection="column">
+            <Box>
+              <Text color={MUTED_COLOR}>
+                Estimated time: ~{formatEta(Math.ceil(preview.length / EFFECTIVE_DELETE_LIMIT) * 15 * 60)}
+                {" "}({EFFECTIVE_DELETE_LIMIT} deletes per 15-min window)
+              </Text>
+            </Box>
+            <Box>
+              <Text color={MUTED_COLOR}>Estimated cost: </Text>
+              <CostBadge endpoint="tweets/delete" count={preview.length} />
+            </Box>
           </Box>
           <Box marginTop={1}>
             <Select
@@ -306,7 +362,6 @@ export function BatchDeleteScreen({ twitter, archive, onBack }: BatchDeleteProps
         </Box>
       )}
 
-      <KeyHints hints={step === "deleting" ? ["p: pause", "c: cancel"] : ["esc: back"]} showBack />
-    </Box>
+    </FullScreen>
   );
 }

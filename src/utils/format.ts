@@ -43,6 +43,16 @@ export function formatEta(seconds: number): string {
   return `${h}h ${m}m`;
 }
 
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+export function getMonthName(month: string): string {
+  const idx = parseInt(month, 10) - 1;
+  return MONTH_NAMES[idx] ?? month;
+}
+
 export function parseTweetDate(dateStr: string): Date {
   // X archive format: "Tue Oct 10 12:34:56 +0000 2023"
   return new Date(dateStr);

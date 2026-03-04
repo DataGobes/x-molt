@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Box, Text } from "ink";
 import { TextInput, Select, Spinner } from "@inkjs/ui";
-import { Header } from "../components/header.js";
-import { KeyHints } from "../components/footer.js";
+import { FullScreen } from "../components/full-screen.js";
+import { CostBadge } from "../components/cost-badge.js";
 import { BRAND_COLOR, ERROR_COLOR, SUCCESS_COLOR, MUTED_COLOR } from "../utils/constants.js";
 
 type Step = "input" | "confirm" | "deleting" | "done";
@@ -31,8 +31,7 @@ export function DeleteTweetScreen({ twitter, onBack }: DeleteTweetProps) {
   };
 
   return (
-    <Box flexDirection="column">
-      <Header title="Delete Tweet" />
+    <FullScreen title="Delete Tweet" hints={["esc: back"]} showBack>
 
       {twitter.error && (
         <Box marginBottom={1}>
@@ -62,7 +61,10 @@ export function DeleteTweetScreen({ twitter, onBack }: DeleteTweetProps) {
 
       {step === "confirm" && (
         <Box flexDirection="column">
-          <Text>Delete tweet <Text bold color={BRAND_COLOR}>{tweetId}</Text>?</Text>
+          <Box>
+            <Text>Delete tweet <Text bold color={BRAND_COLOR}>{tweetId}</Text>? </Text>
+            <CostBadge endpoint="tweets/delete" />
+          </Box>
           <Text color={ERROR_COLOR}>This action cannot be undone.</Text>
           <Box marginTop={1}>
             <Select
@@ -94,7 +96,6 @@ export function DeleteTweetScreen({ twitter, onBack }: DeleteTweetProps) {
         </Box>
       )}
 
-      <KeyHints hints={["esc: back"]} showBack />
-    </Box>
+    </FullScreen>
   );
 }

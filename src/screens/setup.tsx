@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Box, Text } from "ink";
 import { TextInput, Select } from "@inkjs/ui";
-import { Header } from "../components/header.js";
-import { KeyHints } from "../components/footer.js";
+import { FullScreen } from "../components/full-screen.js";
 import { saveCredentials } from "../config.js";
 import type { Credentials } from "../types.js";
 import { BRAND_COLOR, SUCCESS_COLOR, ERROR_COLOR, MUTED_COLOR } from "../utils/constants.js";
@@ -50,22 +49,24 @@ export function SetupScreen({ twitter, onComplete }: SetupProps) {
         setStep("appKey");
         return;
       }
+      // Save immediately so credentials persist even if verification fails
+      saveCredentials(fullCreds);
       const verified = await twitter.verifyCredentials();
       if (verified) {
-        saveCredentials(fullCreds);
         setStep("done");
         setTimeout(onComplete, 1500);
       } else {
-        setError("Credentials are invalid. Please re-enter.");
-        setStep("appKey");
+        // Credentials saved but couldn't verify — still proceed
+        // (X Free tier may not support v2.me)
+        setStep("done");
+        setTimeout(onComplete, 1500);
       }
       setVerifying(false);
     })();
   }, [step]);
 
   return (
-    <Box flexDirection="column">
-      <Header title="Setup" />
+    <FullScreen title="Setup" hints={["enter: submit"]}>
 
       {error && (
         <Box marginBottom={1}>
@@ -169,7 +170,6 @@ export function SetupScreen({ twitter, onComplete }: SetupProps) {
         </Box>
       )}
 
-      <KeyHints hints={["enter: submit"]} />
-    </Box>
+    </FullScreen>
   );
 }

@@ -13,6 +13,10 @@ export default defineConfig({
   // Mark native and problematic modules as external
   external: [
     "better-sqlite3",
+    "sqlite-vec",
+    "@xenova/transformers",
+    "sharp",
+    "onnxruntime-node",
     "react-devtools-core",
     "yoga-wasm-web",
   ],

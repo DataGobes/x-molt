@@ -112,10 +112,10 @@ That's it. First run launches the setup wizard.
 
 ## Setup
 
-You need four credentials from the [X Developer Portal](https://developer.x.com/en/portal/dashboard):
+You need four credentials from the [X Developer Portal](https://developer.x.com/en/portal/dashboard) under **OAuth 1.0 Keys**:
 
 ```
-App Key  ·  App Secret  ·  Access Token  ·  Access Secret
+Consumer Key  ·  Consumer Secret  ·  Access Token  ·  Access Token Secret
 ```
 
 Two ways to configure:

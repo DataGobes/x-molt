@@ -500,17 +500,19 @@ export async function getUsage(days = 30): Promise<ApiUsageResult> {
   const data = result.data;
   const dailyUsage: ApiUsageDaily[] = [];
   if (data.daily_project_usage) {
-    for (const entry of data.daily_project_usage.usage ?? []) {
-      dailyUsage.push({
-        date: typeof entry.date === "string" ? entry.date.slice(0, 10) : String(entry.date),
-        usage: typeof entry.usage === "string" ? parseInt(entry.usage, 10) : (entry.usage as number),
-      });
+    for (const project of data.daily_project_usage) {
+      for (const entry of project.usage ?? []) {
+        dailyUsage.push({
+          date: typeof entry.date === "string" ? entry.date.slice(0, 10) : String(entry.date),
+          usage: typeof entry.usage === "string" ? parseInt(entry.usage, 10) : (entry.usage as number),
+        });
+      }
     }
   }
   return {
     projectId: data.project_id ?? "",
     projectUsage: typeof data.project_usage === "string" ? parseInt(data.project_usage, 10) : (data.project_usage ?? 0),
-    projectCap: data.project_cap ?? 0,
+    projectCap: typeof data.project_cap === "string" ? parseInt(data.project_cap, 10) : (data.project_cap ?? 0),
     capResetDay: data.cap_reset_day ?? 0,
     dailyUsage,
   };

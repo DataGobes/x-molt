@@ -1,17 +1,9 @@
 name: Publish to npm
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Version bump type"
-        required: true
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
-        default: patch
+  push:
+    tags:
+      - "v*"
 
 jobs:
   publish:
@@ -24,8 +16,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate tag matches package.json version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -49,16 +48,10 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Bump version
-        run: npm version ${{ inputs.version }} -m "Release v%s"
-
-      - name: Push version commit and tag
-        run: git push --follow-tags
-
       - name: Publish to npm
         run: npm publish --provenance --access public
+
+      - name: Create GitHub Release
+        run: gh release create "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
